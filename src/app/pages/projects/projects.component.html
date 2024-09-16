@@ -1,0 +1,126 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <h5>Projects</h5>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2"
+                            (click)="openNew()"></button>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table #dt [value]="projects" responsiveLayout="scroll" [rows]="5"
+                [globalFilterFields]="['id','projectName','projectManager','projectStatus','projectVersion']" [paginator]="true"
+                [rowsPerPageOptions]="[5,10,20]" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowHover]="true"
+                dataKey="id">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Manage Projects</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="id" style="white-space: nowrap;">ID <p-sortIcon field="id"></p-sortIcon></th>
+                        <th pSortableColumn="projectName" style="white-space: nowrap;">Project Name <p-sortIcon field="projectName"></p-sortIcon></th>
+                        <th pSortableColumn="projectVersion" style="white-space: nowrap;">Version <p-sortIcon field="projectVersion"></p-sortIcon></th>
+                        <th pSortableColumn="projectStatus" style="white-space: nowrap;">Status <p-sortIcon field="projectStatus"></p-sortIcon></th>
+                        <th pSortableColumn="projectManager" style="white-space: nowrap;">Manager <p-sortIcon field="projectManager"></p-sortIcon></th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-project>
+                    <tr>
+                        <td><span class="p-column-title">ID</span>{{ project.id }}</td>
+                        <td><span class="p-column-title">Project Name</span>{{ project.projectName }}</td>
+                        <td><span class="p-column-title">Version</span>{{ project.projectVersion }}</td>
+                        <td><span class="p-column-title">Status</span>{{ project.projectStatus }}</td>
+                        <td><span class="p-column-title">Manager</span>{{ project.projectManager }}</td>
+                    </tr>
+                </ng-template>
+
+            </p-table>
+
+        </div>
+
+        <p-dialog [(visible)]="projectDialoge" [modal]="true" header="Create Project" [style]="{width: '500px'}" class="p-fluid">
+            <form #projectForm="ngForm">
+        
+                <!-- Project Name Field -->
+                <div class="field">
+                    <label for="projectName">Project Name</label>
+                    <input type="text" pInputText id="projectName" name="projectName" [(ngModel)]="project.projectName"
+                           required [ngModelOptions]="{standalone: true}" #projectNameField="ngModel"
+                           [ngClass]="{'ng-invalid ng-dirty': projectNameField.invalid && projectNameField.touched}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="projectNameField.invalid && projectNameField.touched">
+                        Project Name is required.
+                    </small>
+                </div>
+        
+                <!-- Project Version Field -->
+                <div class="field">
+                    <label for="projectVersion">Version</label>
+                    <input type="number" pInputText id="projectVersion" name="projectVersion" [(ngModel)]="project.projectVersion"
+                           required [ngModelOptions]="{standalone: true}" #projectVersionField="ngModel"
+                           [ngClass]="{'ng-invalid ng-dirty': projectVersionField.invalid && projectVersionField.touched}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="projectVersionField.invalid && projectVersionField.touched">
+                        Project Version is required.
+                    </small>
+                </div>
+        
+                <!-- Project Description Field -->
+                <div class="field">
+                    <label for="projectDescription">Description</label>
+                    <textarea pInputTextarea id="projectDescription" name="projectDescription" [(ngModel)]="project.projectDescription"
+                              required [ngModelOptions]="{standalone: true}" #projectDescriptionField="ngModel"
+                              [ngClass]="{'ng-invalid ng-dirty': projectDescriptionField.invalid && projectDescriptionField.touched}">
+                    </textarea>
+                    <small class="ng-dirty ng-invalid" *ngIf="projectDescriptionField.invalid && projectDescriptionField.touched">
+                        Project Description is required.
+                    </small>
+                </div>
+        
+                <!-- Project Status Field -->
+                <div class="field">
+                    <label for="projectStatus">Status</label>
+                    <input type="text" pInputText id="projectStatus" name="projectStatus" [(ngModel)]="project.projectStatus"
+                           required [ngModelOptions]="{standalone: true}" #projectStatusField="ngModel"
+                           [ngClass]="{'ng-invalid ng-dirty': projectStatusField.invalid && projectStatusField.touched}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="projectStatusField.invalid && projectStatusField.touched">
+                        Project Status is required.
+                    </small>
+                </div>
+        
+                <!-- Project Manager Field -->
+                <div class="field">
+                    <label for="projectManager">Manager</label>
+                    <input type="text" pInputText id="projectManager" name="projectManager" [(ngModel)]="project.projectManager"
+                           required [ngModelOptions]="{standalone: true}" #projectManagerField="ngModel"
+                           [ngClass]="{'ng-invalid ng-dirty': projectManagerField.invalid && projectManagerField.touched}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="projectManagerField.invalid && projectManagerField.touched">
+                        Project Manager is required.
+                    </small>
+                </div>
+        
+            </form>
+        
+            <!-- Dialog Footer -->
+            <ng-template pTemplate="footer">
+                <button pButton type="button" label="Cancel" (click)="hideDialog()"></button>
+                <button pButton type="button" label="Save" (click)="saveProject()" [disabled]="!projectForm.valid"></button>
+            </ng-template>
+        </p-dialog>
+        
+
+    </div>
+</div>

@@ -1,0 +1,205 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <h5>Employees</h5>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="new" icon="pi pi-plus" class="p-button-success mr-2"
+                            (click)="openNew()"></button>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table #dt [value]="employees" responsiveLayout="scroll" [rows]="5"
+                [globalFilterFields]="['id','name','email','position','department','phone']" [paginator]="true"
+                [rowsPerPageOptions]="[5,10,20]" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowHover]="true"
+                dataKey="id">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Manage Employees</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="id" style="white-space: nowrap;">ID <p-sortIcon field="id"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="name" style="white-space: nowrap;">Name <p-sortIcon
+                                field="name"></p-sortIcon></th>
+                        <th pSortableColumn="email" style="white-space: nowrap;">Email <p-sortIcon
+                                field="email"></p-sortIcon></th>
+                        <th pSortableColumn="position" style="white-space: nowrap;">Position <p-sortIcon
+                                field="position"></p-sortIcon></th>
+                        <th pSortableColumn="department" style="white-space: nowrap;">Department <p-sortIcon
+                                field="department"></p-sortIcon></th>
+                        <th>Phone</th>
+                        <th>Projects</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-employee>
+                    <tr>
+                        <td><span class="p-column-title">ID</span>{{ employee.id }}</td>
+                        <td><span class="p-column-title">Name</span>{{ employee.name }}</td>
+                        <td><span class="p-column-title">Email</span>{{ employee.email }}</td>
+                        <td><span class="p-column-title">Position</span>{{ employee.position }}</td>
+                        <td><span class="p-column-title">Department</span>{{ employee.department }}</td>
+                        <td><span class="p-column-title">Phone</span>{{ employee.phone }}</td>
+                        <td>
+                            <button pButton pRipple icon="pi pi-folder" class="p-button-rounded p-button-info mr-2"
+                                pTooltip="View Projects" (click)="viewEmployeeProject(employee)"></button>
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-share-alt"
+                                    class="p-button-rounded p-button-success mr-2" pTooltip="Assign Project"
+                                    (click)="assignProject(employee)"></button>
+                                <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2"
+                                    pTooltip="View Employee" (click)="viewEmployee(employee)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+
+            </p-table>
+
+        </div>
+        <p-dialog [(visible)]="employeeDialoge" [modal]="true" header="Create Employee" [style]="{width: '500px'}"
+            class="p-fluid">
+            <form #employeeForm="ngForm">
+
+                <!-- Name Field -->
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" pInputText id="name" name="name" [disabled]="viewFlag"
+                        [(ngModel)]="employee.name" required pattern="^[a-zA-Z ]*$"
+                        [ngModelOptions]="{standalone: true}" [ngClass]="{
+                        'ng-invalid ng-dirty': (submitted || employeeForm.submitted || nameField.touched) && !employee.name,
+                        'bold-black-text': viewFlag
+                    }" #nameField="ngModel" />
+                    <small class="ng-dirty ng-invalid" *ngIf="nameField.invalid && (nameField.touched || submitted)">
+                        Name is required and must contain only letters.
+                    </small>
+                </div>
+
+                <!-- Email Field -->
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" pInputText id="email" name="email" [disabled]="viewFlag"
+                        [(ngModel)]="employee.email" required email [ngModelOptions]="{standalone: true}" [ngClass]="{
+                        'ng-invalid ng-dirty': (submitted || employeeForm.submitted || emailField.touched) && !employee.email,
+                        'bold-black-text': viewFlag
+                    }" #emailField="ngModel" />
+                    <small class="ng-dirty ng-invalid" *ngIf="emailField.invalid && (emailField.touched || submitted)">
+                        A valid email is required.
+                    </small>
+                </div>
+
+                <!-- Position Field -->
+                <div class="field">
+                    <label for="position">Position</label>
+                    <input type="text" pInputText id="position" name="position" [disabled]="viewFlag"
+                        [(ngModel)]="employee.position" required [ngModelOptions]="{standalone: true}" [ngClass]="{
+                        'ng-invalid ng-dirty': (submitted || employeeForm.submitted || positionField.touched) && !employee.position,
+                        'bold-black-text': viewFlag
+                    }" #positionField="ngModel" />
+                    <small class="ng-dirty ng-invalid"
+                        *ngIf="positionField.invalid && (positionField.touched || submitted)">
+                        Position is required.
+                    </small>
+                </div>
+
+                <!-- Department Field -->
+                <div class="field">
+                    <label for="department">Department</label>
+                    <input type="text" pInputText id="department" name="department" [disabled]="viewFlag"
+                        [(ngModel)]="employee.department" required [ngModelOptions]="{standalone: true}" [ngClass]="{
+                        'ng-invalid ng-dirty': (submitted || employeeForm.submitted || departmentField.touched) && !employee.department,
+                        'bold-black-text': viewFlag
+                    }" #departmentField="ngModel" />
+                    <small class="ng-dirty ng-invalid"
+                        *ngIf="departmentField.invalid && (departmentField.touched || submitted)">
+                        Department is required.
+                    </small>
+                </div>
+
+                <!-- Phone Field -->
+                <div class="field">
+                    <label for="phone">Phone</label>
+                    <input type="tel" pInputText id="phone" name="phone" [disabled]="viewFlag"
+                        [(ngModel)]="employee.phone" required pattern="^[+]?[0-9]*$"
+                        [ngModelOptions]="{standalone: true}" [ngClass]="{
+                        'ng-invalid ng-dirty': (submitted || employeeForm.submitted || phoneField.touched) && !employee.phone,
+                        'bold-black-text': viewFlag
+                    }" #phoneField="ngModel" />
+                    <small class="ng-dirty ng-invalid" *ngIf="phoneField.invalid && (phoneField.touched || submitted)">
+                        Phone is required and must contain only numbers and the '+' sign.
+                    </small>
+                </div>
+
+            </form>
+
+            <!-- Dialog Footer -->
+            <ng-template pTemplate="footer">
+                <button pButton type="button" label="Cancel" (click)="hideDialog()"></button>
+                <button *ngIf="!viewFlag" pButton type="button" label="Save" (click)="saveEmployee()"
+                    [disabled]="!employeeForm.valid"></button>
+            </ng-template>
+        </p-dialog>
+
+
+
+        <p-dialog [(visible)]="assignProjectDialog" [modal]="true" header="Assign Project" [style]="{width: '500px'}"
+            class="p-fluid">
+
+            <p-multiSelect [options]="availableProjects" [(ngModel)]="selectedProjects" optionLabel="projectName"
+                placeholder="Select Project" appendTo="body" />
+            <!-- Dialog Footer -->
+            <ng-template pTemplate="footer">
+                <button pButton type="button" label="Cancel" (click)="hideDialog()"></button>
+                <button *ngIf="!viewFlag" pButton type="button" label="Save" (click)="assignProjects()"
+                    [disabled]="!employeeForm.valid"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="displayProjects" [modal]="true" header="Projects" [style]="{width: '500px'}"
+            class="p-fluid" [maximizable]="true">
+            <p-table #dt1 [value]="employee.projects" responsiveLayout="scroll" [rows]="5"
+                [globalFilterFields]="['id','projectName']" [paginator]="true" [rowsPerPageOptions]="[5,10,20]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowHover]="true"
+                dataKey="id">
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="id" style="white-space: nowrap;">ID <p-sortIcon field="id"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="projectName" style="white-space: nowrap;">projectName <p-sortIcon
+                                field="name"></p-sortIcon></th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-project>
+                    <tr>
+                        <td><span class="p-column-title">ID</span>{{ project.id }}</td>
+                        <td><span class="p-column-title">projectName</span>{{ project.projectName }}</td>
+                    </tr>
+                </ng-template>
+
+            </p-table>
+        </p-dialog>
+
+
+
+    </div>
+</div>
